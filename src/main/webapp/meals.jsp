@@ -15,8 +15,7 @@
     </tr>
 
     <c:forEach var="meal" items="${allMeals}">
-        <tr <c:if test="${meal.excess}">style="color:red;"</c:if>
-            <c:if test="${!meal.excess}">style="color:green;"</c:if>>
+        <tr style="${meal.excess ? 'color:red' : 'color:green'}">
             <td>${meal.date}</td>
             <td>${meal.time}</td>
             <td>${meal.description}</td>
