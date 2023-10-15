@@ -8,8 +8,8 @@
 <h2>Edit meal</h2>
 <br>
 <form method="POST" action='meals' name="frmEditMeal">
-        Meal ID: <input type="text" readonly="readonly" name="id"
-            value="<c:out value="${meal.id}" />" /> <br />
+        <input type="hidden" readonly="readonly" name="id"
+            value="<c:out value="${meal.id}" />" />
         DateTime: <input
             type="datetime-local" name="datetime"
             value="<c:out value="${meal.dateTime}" />" /> <br />
