@@ -3,18 +3,13 @@
 <html lang="ru">
 <head>
     <style>
-    table, td, th {
-      border: 1px solid;
-    }
+        .normal {
+          color: green;
+        }
 
-    table {
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 10px;
-      text-align: left;
-    }
+        .excess {
+           color: red;
+        }
     </style>
 </head>
 <body>
@@ -26,17 +21,19 @@
 <p><a href="meals?action=insert">Add Meal</a></p>
 
 
-<table>
-    <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Description</th>
-        <th>Calories</th>
-        <th colspan=2>Action</th>
-    </tr>
+<table border="1" cellpadding="8" cellspacing="0">
+    <thread>
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Description</th>
+            <th>Calories</th>
+            <th colspan=2>Action</th>
+        </tr>
+    </thread>
 
     <c:forEach var="meal" items="${meals}">
-        <tr style="${meal.excess ? 'color:red' : 'color:green'}">
+        <tr class="${meal.excess ? 'excess' : 'normal'}">
             <td>${meal.date}</td>
             <td>${meal.time}</td>
             <td>${meal.description}</td>
