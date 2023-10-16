@@ -18,7 +18,7 @@
 
 <h2>All meals</h2>
 <br>
-<p><a href="meals?action=insert">Add Meal</a></p>
+<p><a href="meals?action=create">Add Meal</a></p>
 
 
 <table border="1" cellpadding="8" cellspacing="0">
@@ -38,7 +38,7 @@
             <td>${meal.time}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>
-            <td><a href="meals?action=edit&id=<c:out value="${meal.id}"/>">Update</a></td>
+            <td><a href="meals?action=update&id=<c:out value="${meal.id}"/>">Update</a></td>
             <td><a href="meals?action=delete&id=<c:out value="${meal.id}"/>">Delete</a></td>
         </tr>
     </c:forEach>

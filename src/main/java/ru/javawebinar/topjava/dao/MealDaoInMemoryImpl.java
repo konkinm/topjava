@@ -5,10 +5,9 @@ import ru.javawebinar.topjava.util.AtomicIdCounter;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class MealDaoInMemoryImpl implements MealDAO{
 
@@ -28,24 +27,24 @@ public class MealDaoInMemoryImpl implements MealDAO{
         this.init();
     }
     @Override
-    public List<Meal> getAll() {
-        return repo.values().parallelStream().collect(Collectors.toList());
+    public Collection<Meal> getAll() {
+        return repo.values();
     }
 
     @Override
-    public void save(Meal meal) {
-        if (meal.getId() != null){
-            repo.replace(meal.getId(),meal);
-        } else {
-            Integer id = AtomicIdCounter.nextId();
-            meal.setId(id);
-            repo.put(id,meal);
+    public Meal save(Meal meal) {
+        if (meal.isNew()) {
+            meal.setId(AtomicIdCounter.nextId());
+            repo.put(meal.getId(), meal);
+            return meal;
         }
+        // handle case: update, but not present in storage
+        return repo.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
     @Override
-    public void delete(Integer id) {
-        repo.remove(id);
+    public boolean delete(Integer id) {
+        return repo.remove(id) != null;
     }
 
     @Override
