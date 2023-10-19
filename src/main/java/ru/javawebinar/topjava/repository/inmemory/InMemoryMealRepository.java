@@ -17,38 +17,48 @@ public class InMemoryMealRepository implements MealRepository {
 
     {
         MealsUtil.meals.forEach(m -> save(m, 1));
+        repository.get(7).setUserId(2);
     }
 
     @Override
-    public Meal save(Meal meal, Integer userId) {
-            if (meal.isNew()) {
-                meal.setId(counter.incrementAndGet());
-                meal.setUserId(userId);
-                repository.put(meal.getId(), meal);
-                return meal;
-            } else if (Objects.equals(userId, this.get(meal.getId(),userId).getUserId())) {
+    public Meal save(Meal meal, int userId) {
+        if (meal.isNew()) {
+            meal.setId(counter.incrementAndGet());
+            meal.setUserId(userId);
+            repository.put(meal.getId(), meal);
+            return meal;
+        } else if (repository.containsKey(meal.getId())) {
+            if (Objects.equals(userId, this.get(meal.getId(), userId).getUserId())) {
                 meal.setUserId(userId);
                 // handle case: update, but not present in storage
                 return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
-            } else return null;
+            }
+        }
+        return null;
     }
 
     @Override
-    public boolean delete(int id, Integer userId) {
-        return (Objects.equals(repository.get(id).getUserId(), userId)) ? repository.remove(id) != null : false;
+    public boolean delete(int id, int userId) {
+        return repository.containsKey(id) &&
+                Objects.equals(repository.get(id).getUserId(), userId) &&
+                repository.remove(id) != null;
     }
 
     @Override
-    public Meal get(int id, Integer userId) {
-        Meal meal = repository.get(id);
-        return Objects.equals(meal.getUserId(), userId) ? meal : null;
+    public Meal get(int id, int userId) {
+        if (repository.containsKey(id)) {
+            Meal meal = repository.get(id);
+            return Objects.equals(meal.getUserId(), userId) ? meal : null;
+        } else return null;
     }
 
     @Override
-    public List<Meal> getAll(Integer userId) {
-        return repository.values().stream()
+    public List<Meal> getAll(int userId) {
+        return repository.values()
+                .stream()
                 .filter(m -> Objects.equals(m.getUserId(), userId))
-                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
+                .sorted(Comparator.comparing(Meal::getDateTime)
+                        .reversed())
                 .collect(Collectors.toList());
     }
 }
