@@ -24,6 +24,13 @@ public class MealServlet extends HttpServlet {
     private MealRestController controller;
 
     @Override
+    public void init() throws ServletException {
+        ConfigurableApplicationContext appCtx =
+                new ClassPathXmlApplicationContext("spring/spring-app.xml");
+        controller = appCtx.getBean(MealRestController.class);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
         String id = request.getParameter("id");
@@ -32,7 +39,7 @@ public class MealServlet extends HttpServlet {
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
                 Integer.parseInt(request.getParameter("calories")),
-                -1); // non-existing user
+                null);
 
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
         if (meal.isNew()) {
@@ -82,13 +89,6 @@ public class MealServlet extends HttpServlet {
     private int getId(HttpServletRequest request) {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
         return Integer.parseInt(paramId);
-    }
-
-    @Override
-    public void init() throws ServletException {
-        ConfigurableApplicationContext appCtx =
-                new ClassPathXmlApplicationContext("spring/spring-app.xml");
-        controller = appCtx.getBean(MealRestController.class);
     }
 
     @Override

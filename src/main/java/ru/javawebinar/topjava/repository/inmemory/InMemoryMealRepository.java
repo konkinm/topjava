@@ -16,8 +16,8 @@ public class InMemoryMealRepository implements MealRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.meals.forEach(m -> save(m, 1));
-        repository.get(7).setUserId(2);
+        MealsUtil.meals1.forEach(m -> save(m, 1));
+        MealsUtil.meals2.forEach(m -> save(m, 2));
     }
 
     @Override
@@ -27,29 +27,26 @@ public class InMemoryMealRepository implements MealRepository {
             meal.setUserId(userId);
             repository.put(meal.getId(), meal);
             return meal;
-        } else if (repository.containsKey(meal.getId())) {
-            if (Objects.equals(userId, this.get(meal.getId(), userId).getUserId())) {
+        } else if (this.get(meal.getId(), userId) != null) {
                 meal.setUserId(userId);
                 // handle case: update, but not present in storage
                 return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
             }
-        }
         return null;
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        return repository.containsKey(id) &&
-                Objects.equals(repository.get(id).getUserId(), userId) &&
+        Meal meal = repository.get(id);
+        return meal != null &&
+                Objects.equals(meal.getUserId(), userId) &&
                 repository.remove(id) != null;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        if (repository.containsKey(id)) {
             Meal meal = repository.get(id);
-            return Objects.equals(meal.getUserId(), userId) ? meal : null;
-        } else return null;
+            return meal != null && Objects.equals(meal.getUserId(), userId) ? meal : null;
     }
 
     @Override

@@ -26,10 +26,10 @@
     <p><b>Date&Time filtering:</b></p>
         <form method="get" action="meals">
         <input type="hidden" name="action" value="filter">
-        Start Date <input type="date" name="startDate" value="${startDate}">
-        End Date <input type="date" name="endDate" value="${endDate}">
-        Start Time <input type="time" name="startTime" value="${startTime}">
-        End Time <input type="time" name="endTime" value="${endTime}">
+        Start Date <input type="date" name="startDate" value="${param.startDate}">
+        End Date <input type="date" name="endDate" value="${param.endDate}">
+        Start Time <input type="time" name="startTime" value="${param.startTime}">
+        End Time <input type="time" name="endTime" value="${param.endTime}">
         <button type="submit">Filter</button>
     </form>
     <br><br>

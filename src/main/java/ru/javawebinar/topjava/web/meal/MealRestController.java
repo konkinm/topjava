@@ -38,7 +38,7 @@ public class MealRestController {
         return MealsUtil.getTos(service.getAll(authUserId()).stream()
                 .filter(m -> startDate.isEmpty() || m.getDate().isAfter(LocalDate.parse(startDate).minusDays(1)))
                 .filter(m -> endDate.isEmpty() || m.getDate().isBefore(LocalDate.parse(endDate).plusDays(1)))
-                .filter(m -> startTime.isEmpty() || m.getTime().isAfter(LocalTime.parse(startTime)))
+                .filter(m -> startTime.isEmpty() || m.getTime().isAfter(LocalTime.parse(startTime).minusMinutes(1)))
                 .filter(m -> endTime.isEmpty() || m.getTime().isBefore(LocalTime.parse(endTime)))
                 .collect(Collectors.toList()), authUserCaloriesPerDay());
     }
