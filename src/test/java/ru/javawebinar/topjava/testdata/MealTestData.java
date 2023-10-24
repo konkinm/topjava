@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava;
+package ru.javawebinar.topjava.testdata;
 
 import ru.javawebinar.topjava.model.Meal;
 
