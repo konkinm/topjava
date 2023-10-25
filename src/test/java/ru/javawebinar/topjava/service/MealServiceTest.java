@@ -12,7 +12,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
@@ -20,10 +19,7 @@ import static ru.javawebinar.topjava.testdata.MealTestData.*;
 import static ru.javawebinar.topjava.testdata.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.testdata.UserTestData.USER_ID;
 
-@ContextConfiguration({
-        "classpath:spring/spring-app.xml",
-        "classpath:spring/spring-db.xml"
-})
+@ContextConfiguration("classpath:spring/spring-app-jdbc.xml")
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
@@ -96,10 +92,8 @@ public class MealServiceTest {
     public void create() {
         Meal created = service.create(getNew(), USER_ID);
         Integer newId = created.getId();
-        LocalDateTime createdDateTime = created.getDateTime();
         Meal newMeal = getNew();
         newMeal.setId(newId);
-        newMeal.setDateTime(createdDateTime);
         assertMatch(created, newMeal);
         assertMatch(service.get(newId, USER_ID), newMeal);
     }

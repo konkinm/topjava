@@ -5,7 +5,6 @@ import ru.javawebinar.topjava.model.Meal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +21,8 @@ public class MealTestData {
     public static final int SUPPER2_ID = START_SEQ + 9;
     public static final int NOT_FOUND = 10;
     public static final LocalDateTime BREAKFAST1_DATE_TIME = LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0);
+    public static final LocalDateTime NEW_DATE_TIME = LocalDateTime.of(2020, Month.JANUARY, 1, 0, 0);
+    public static final LocalDateTime UPDATED_DATE_TIME = LocalDateTime.of(2020, Month.JANUARY, 30, 10, 10);
     public static final LocalDate LOCAL_DATE = LocalDate.of(2020, Month.JANUARY, 30);
     public static final Meal breakfast1 = new Meal(BREAKFAST1_ID, BREAKFAST1_DATE_TIME, "Завтрак", 500);
     public static final Meal dinner1 = new Meal(DINNER1_ID, LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000);
@@ -32,12 +33,12 @@ public class MealTestData {
     public static final Meal supper2 = new Meal(SUPPER2_ID, LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410);
 
     public static Meal getNew() {
-        return new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), "New meal", 500);
+        return new Meal(null, NEW_DATE_TIME, "New meal", 500);
     }
 
     public static Meal getUpdated() {
         Meal updated = new Meal(breakfast1);
-        updated.setDateTime(BREAKFAST1_DATE_TIME);
+        updated.setDateTime(UPDATED_DATE_TIME);
         updated.setDescription("Updated description");
         updated.setCalories(1000);
         return updated;
