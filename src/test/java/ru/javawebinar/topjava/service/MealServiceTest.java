@@ -19,7 +19,7 @@ import static ru.javawebinar.topjava.testdata.MealTestData.*;
 import static ru.javawebinar.topjava.testdata.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.testdata.UserTestData.USER_ID;
 
-@ContextConfiguration("classpath:spring/spring-app-jdbc.xml")
+@ContextConfiguration({"classpath:spring/spring-app.xml", "classpath:spring/spring-app-jdbc.xml"})
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
@@ -36,6 +36,12 @@ public class MealServiceTest {
     public void get() {
         Meal meal = service.get(BREAKFAST1_ID, USER_ID);
         assertMatch(meal, breakfast1);
+    }
+
+    @Test
+    public void getNonExisting() {
+        assertThrows(NotFoundException.class, () ->
+                service.get(NOT_FOUND, USER_ID));
     }
 
     @Test
@@ -63,14 +69,32 @@ public class MealServiceTest {
 
     @Test
     public void getBetweenInclusive() {
-        List<Meal> allBetweenInclusive = service.getBetweenInclusive(LOCAL_DATE, LOCAL_DATE, USER_ID);
-        assertMatch(allBetweenInclusive, supper1, dinner1, breakfast1);
+        List<Meal> allBetweenInclusive = service.getBetweenInclusive(LOCAL_DATE_31_01_2020, LOCAL_DATE_31_01_2020, USER_ID);
+        assertMatch(allBetweenInclusive, supper2, dinner2, breakfast2, border_meal);
+    }
+
+    @Test
+    public void getBetweenInclusiveStartDateNull() {
+        List<Meal> allBetweenInclusive = service.getBetweenInclusive(null, LOCAL_DATE_31_01_2020, USER_ID);
+        assertMatch(allBetweenInclusive, supper2, dinner2, breakfast2, border_meal, supper1, dinner1, breakfast1);
+    }
+
+    @Test
+    public void getBetweenInclusiveEndDateNull() {
+        List<Meal> allBetweenInclusive = service.getBetweenInclusive(LOCAL_DATE_31_01_2020, null, USER_ID);
+        assertMatch(allBetweenInclusive, breakfast3, supper2, dinner2, breakfast2, border_meal);
+    }
+
+    @Test
+    public void getBetweenInclusiveNullDates() {
+        List<Meal> allBetweenInclusive = service.getBetweenInclusive(null, null, USER_ID);
+        assertMatch(allBetweenInclusive, breakfast3, supper2, dinner2, breakfast2, border_meal, supper1, dinner1, breakfast1);
     }
 
     @Test
     public void getAll() {
         List<Meal> all = service.getAll(USER_ID);
-        assertMatch(all, supper2, dinner2, breakfast2, border_meal, supper1, dinner1, breakfast1);
+        assertMatch(all, breakfast3, supper2, dinner2, breakfast2, border_meal, supper1, dinner1, breakfast1);
     }
 
     @Test
