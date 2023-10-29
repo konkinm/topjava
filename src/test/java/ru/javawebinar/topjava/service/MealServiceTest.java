@@ -1,6 +1,11 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
+import org.junit.AssumptionViolatedException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -13,6 +18,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -29,6 +35,35 @@ public class MealServiceTest {
 
     @Autowired
     private MealService service;
+
+    private static String watchedLog;
+
+    @Rule
+    public final Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void succeeded(long nanos, Description description) {
+            System.out.println("Success! Test took " +
+                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n");
+            watchedLog += description.getDisplayName() + " success! Test took " +
+                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n";
+        }
+
+        @Override
+        protected void failed(long nanos, Throwable e, Description description) {
+            System.out.println("Fail! Test took " +
+                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n");
+            watchedLog += description.getDisplayName() + " failed! Test took " +
+                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n";
+        }
+
+        @Override
+        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
+            System.out.println("Skipped! Test took " +
+                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n");
+            watchedLog += description.getDisplayName() + " skipped! Test took " +
+                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n";
+        }
+    };
 
     @Test
     public void delete() {
@@ -107,5 +142,10 @@ public class MealServiceTest {
     @Test
     public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
+    }
+
+    @AfterClass
+    public static void print() {
+        System.out.println(watchedLog);
     }
 }

@@ -6,31 +6,32 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
 @NamedQueries({
-        @NamedQuery(name = Meal.UPDATE, query = "UPDATE Meal m SET m.dateTime=:date_time, " +
-                "m.description=:description, m.calories=:calories WHERE m.id=:id AND m.user.id=:user_id"),
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:user_id"),
-        @NamedQuery(name = Meal.GET, query = "SELECT m FROM Meal m JOIN FETCH m.user " +
+        @NamedQuery(name = Meal.GET, query = "SELECT m FROM Meal m " +
                 "WHERE m.id=:id AND m.user.id=:user_id"),
-        @NamedQuery(name = Meal.GET_BETWEEN_HALF_OPEN, query = "SELECT m FROM Meal m JOIN FETCH m.user " +
+        @NamedQuery(name = Meal.GET_WITH_USER, query = "SELECT m FROM Meal m JOIN FETCH m.user u " +
+                "WHERE m.id=:id AND m.user.id=:user_id"),
+        @NamedQuery(name = Meal.GET_BETWEEN_HALF_OPEN, query = "SELECT m FROM Meal m " +
                 "WHERE m.user.id=:user_id AND m.dateTime >= :start_date_time " +
                 "AND m.dateTime < :end_date_time ORDER BY m.dateTime DESC"),
-        @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m JOIN FETCH m.user " +
+        @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m " +
                 "WHERE m.user.id=:user_id ORDER BY m.dateTime DESC"),
 })
 @Entity
 @Table(name = "meal", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"},
                 name = "uk_user_id_date_time")})
-public class Meal extends AbstractBaseEntity {
-    public static final String UPDATE = "Meal.update";
+public class Meal extends AbstractBaseEntity implements Serializable {
     public static final String DELETE = "Meal.delete";
     public static final String ALL_SORTED = "Meal.getAllSorted";
     public static final String GET = "Meal.get";
+    public static final String GET_WITH_USER = "Meal.getWithUser";
     public static final String GET_BETWEEN_HALF_OPEN = "Meal.getBetweenHalfOpen";
 
     @Column(name = "date_time", nullable = false)
@@ -47,7 +48,7 @@ public class Meal extends AbstractBaseEntity {
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="user_id", nullable = false)
     @NotNull
     private User user;
 
