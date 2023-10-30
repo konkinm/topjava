@@ -1,12 +1,12 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.AfterClass;
-import org.junit.AssumptionViolatedException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,6 +21,7 @@ import java.time.Month;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
+import static org.slf4j.LoggerFactory.getLogger;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
@@ -32,38 +33,32 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-
-    @Autowired
-    private MealService service;
-
-    private static String watchedLog;
-
+    private static final Logger log = getLogger(MealServiceTest.class);
+    private static String watchedLog = "";
     @Rule
     public final Stopwatch stopwatch = new Stopwatch() {
         @Override
-        protected void succeeded(long nanos, Description description) {
-            System.out.println("Success! Test took " +
-                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n");
-            watchedLog += description.getDisplayName() + " success! Test took " +
-                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n";
-        }
-
-        @Override
-        protected void failed(long nanos, Throwable e, Description description) {
-            System.out.println("Fail! Test took " +
-                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n");
-            watchedLog += description.getDisplayName() + " failed! Test took " +
-                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n";
-        }
-
-        @Override
-        protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
-            System.out.println("Skipped! Test took " +
-                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n");
-            watchedLog += description.getDisplayName() + " skipped! Test took " +
-                    TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds\n";
+        protected void finished(long nanos, Description description) {
+            long millis = TimeUnit.NANOSECONDS.toMillis(nanos);
+            log.info("Test took {} milliseconds\n", millis);
+            watchedLog += String.format("| %-30s|%9d |%n", description.getMethodName(), millis);
         }
     };
+    @Autowired
+    private MealService service;
+
+    @AfterClass
+    public static void printTestingTimeSummary() {
+        StringBuilder summary = new StringBuilder();
+        summary.append("\n--------------------------------------------\n");
+        summary.append("|            Testing time summary          |\n");
+        summary.append("|------------------------------------------|\n");
+        summary.append("| Method name                   | Time, ms |\n");
+        summary.append("|------------------------------------------|\n");
+        summary.append(watchedLog);
+        summary.append("--------------------------------------------\n");
+        log.info(summary.toString());
+    }
 
     @Test
     public void delete() {
@@ -142,10 +137,5 @@ public class MealServiceTest {
     @Test
     public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
-    }
-
-    @AfterClass
-    public static void print() {
-        System.out.println(watchedLog);
     }
 }
