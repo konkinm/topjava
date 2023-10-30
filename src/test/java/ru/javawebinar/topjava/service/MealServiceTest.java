@@ -35,6 +35,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 public class MealServiceTest {
     private static final Logger log = getLogger(MealServiceTest.class);
     private static String watchedLog = "";
+
     @Rule
     public final Stopwatch stopwatch = new Stopwatch() {
         @Override
@@ -44,20 +45,20 @@ public class MealServiceTest {
             watchedLog += String.format("| %-30s|%9d |%n", description.getMethodName(), millis);
         }
     };
+
     @Autowired
     private MealService service;
 
     @AfterClass
     public static void printTestingTimeSummary() {
-        StringBuilder summary = new StringBuilder();
-        summary.append("\n--------------------------------------------\n");
-        summary.append("|            Testing time summary          |\n");
-        summary.append("|------------------------------------------|\n");
-        summary.append("| Method name                   | Time, ms |\n");
-        summary.append("|------------------------------------------|\n");
-        summary.append(watchedLog);
-        summary.append("--------------------------------------------\n");
-        log.info(summary.toString());
+        String summary = "\n--------------------------------------------\n" +
+                "|            Testing time summary          |\n" +
+                "|------------------------------------------|\n" +
+                "| Method name                   | Time, ms |\n" +
+                "|------------------------------------------|\n" +
+                watchedLog +
+                "--------------------------------------------\n";
+        log.info(summary);
     }
 
     @Test
