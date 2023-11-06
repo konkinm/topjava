@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
@@ -27,7 +26,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
 public abstract class EntityServiceTest {
     protected static final Logger log = getLogger("result");
-    protected static StringBuilder results;
+    protected static StringBuilder results = new StringBuilder();
     protected static String implementation;
 
     @Rule
@@ -43,11 +42,12 @@ public abstract class EntityServiceTest {
 
     @AfterClass
     public static void printResult() {
-        log.info("\n           for " + implementation +
+        log.info("\n           For " + implementation +
                 "\n---------------------------------" +
                 "\nTest                 Duration, ms" +
                 "\n---------------------------------" +
                 results +
                 "\n---------------------------------");
+        results.setLength(0);
     }
 }

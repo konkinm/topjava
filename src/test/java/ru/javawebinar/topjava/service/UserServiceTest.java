@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.service.user_service_tests;
+package ru.javawebinar.topjava.service;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,8 +8,6 @@ import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.service.EntityServiceTest;
-import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.List;
