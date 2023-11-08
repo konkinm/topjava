@@ -13,7 +13,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public abstract class JdbcMealRepository implements MealRepository {
+public abstract class JdbcMealRepository<T> implements MealRepository {
 
     private static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
 
@@ -32,7 +32,7 @@ public abstract class JdbcMealRepository implements MealRepository {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    protected abstract <T> T getGenericDateTime(LocalDateTime localDateTime);
+    protected abstract T getGenericDateTime(LocalDateTime localDateTime);
 
     @Override
     public Meal save(Meal meal, int userId) {

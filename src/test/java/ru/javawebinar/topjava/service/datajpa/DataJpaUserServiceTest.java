@@ -36,6 +36,7 @@ public class DataJpaUserServiceTest extends UserServiceTest {
     @Test
     public void getWithNoMeals() {
         User user = service.getWithMeals(GUEST_ID);
+        USER_MATCHER.assertMatch(user, guest);
         assertTrue(user.getMeals().isEmpty());
     }
 
