@@ -7,13 +7,10 @@ import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.Profiles;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Repository
 @Profile(Profiles.POSTGRES_DB)
 public class PostgresJdbcMealRepository extends JdbcMealRepository {
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     public PostgresJdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
