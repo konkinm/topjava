@@ -14,7 +14,6 @@ import ru.javawebinar.topjava.repository.JpaUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -37,9 +36,9 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Before
     public void setup() {
         cacheManager.getCache("users").clear();
-        if (Arrays.stream(env.getActiveProfiles())
-                .anyMatch(s -> s.equals(Profiles.JPA) || s.equals(Profiles.DATAJPA)))
+        if (checkActiveProfiles(Profiles.JPA, Profiles.DATAJPA)) {
             jpaUtil.clear2ndLevelHibernateCache();
+        }
     }
 
     @Test
@@ -101,7 +100,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     public void createWithException() throws Exception {
-        Assume.assumeFalse(Arrays.asList(env.getActiveProfiles()).contains(JDBC));
+        Assume.assumeFalse(checkActiveProfiles(JDBC));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "  ", "mail@yandex.ru", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "  ", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.USER)));

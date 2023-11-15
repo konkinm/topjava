@@ -1,7 +1,5 @@
 package ru.javawebinar.topjava.web.meal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -28,10 +26,9 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 @Controller
 @RequestMapping(value = "/meals")
 public class JspMealController extends AbstractMealController{
-    private static final Logger log = LoggerFactory.getLogger(JspMealController.class);
 
     protected JspMealController(MealService service) {
-        super(log, service);
+        super(service);
     }
 
     @GetMapping
@@ -60,7 +57,7 @@ public class JspMealController extends AbstractMealController{
     }
 
     @GetMapping("/add")
-    public String add(HttpServletRequest request, Model model) {
+    public String add(Model model) {
         final Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
         model.addAttribute("meal", meal);
         return "mealForm";
