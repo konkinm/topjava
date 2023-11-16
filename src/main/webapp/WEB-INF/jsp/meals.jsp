@@ -30,7 +30,7 @@
         <button type="submit"><spring:message code="common.filter"/></button>
     </form>
     <hr/>
-    <a href="meals/add"><spring:message code="meal.add"/></a>
+    <a href="${pageContext.request.contextPath}/meals/add"><spring:message code="meal.add"/></a>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
@@ -53,8 +53,8 @@
                 </td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
-                <td><a href="meals/edit?id=${meal.id}"><spring:message code="meal.update"/></a></td>
-                <td><a href="meals/delete?id=${meal.id}"><spring:message code="meal.delete"/></a></td>
+                <td><a href="${pageContext.request.contextPath}/meals/edit?id=${meal.id}"><spring:message code="meal.update"/></a></td>
+                <td><a href="${pageContext.request.contextPath}/meals/delete?id=${meal.id}"><spring:message code="meal.delete"/></a></td>
             </tr>
         </c:forEach>
     </table>
