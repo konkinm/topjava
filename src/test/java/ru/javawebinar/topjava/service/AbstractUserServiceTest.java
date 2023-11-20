@@ -93,6 +93,20 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    public void updateWithRoleAddition() {
+        User updated = getUpdatedWithTwoRoles();
+        service.update(updated);
+        USER_MATCHER.assertMatch(service.get(USER_ID), getUpdatedWithTwoRoles());
+    }
+
+    @Test
+    public void updateWithRoleDeletion() {
+        User updated = getUpdatedWithOneRole();
+        service.update(updated);
+        USER_MATCHER.assertMatch(service.get(ADMIN_ID), getUpdatedWithOneRole());
+    }
+
+    @Test
     public void getAll() {
         List<User> all = service.getAll();
         USER_MATCHER.assertMatch(all, admin, guest, user);

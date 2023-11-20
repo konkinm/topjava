@@ -26,6 +26,22 @@ public class UserTestData {
     }
 
     public static User getUpdated() {
+        return getUpdated(user);
+    }
+
+    public static User getUpdatedWithTwoRoles() {
+        User user = getUpdated();
+        user.setRoles(Set.of(Role.USER, Role.ADMIN));
+        return user;
+    }
+
+    public static User getUpdatedWithOneRole() {
+        User user = getUpdated(admin);
+        user.setRoles(Set.of(Role.ADMIN));
+        return user;
+    }
+
+    private static User getUpdated(User user) {
         User updated = new User(user);
         updated.setEmail("update@gmail.com");
         updated.setName("UpdatedName");
