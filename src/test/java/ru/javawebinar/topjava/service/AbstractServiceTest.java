@@ -15,9 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.TimingRules;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 
@@ -51,6 +48,6 @@ public abstract class AbstractServiceTest {
     }
 
     protected boolean checkActiveProfiles(String... profiles) {
-        return !Collections.disjoint(Arrays.asList(profiles), Arrays.asList(env.getActiveProfiles()));
+        return env.matchesProfiles(profiles);
     }
 }

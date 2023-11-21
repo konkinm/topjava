@@ -19,9 +19,7 @@ import ru.javawebinar.topjava.repository.UserRepository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 @Repository
 @Transactional(readOnly = true)
@@ -32,25 +30,27 @@ public class JdbcUserRepository implements UserRepository {
     private static final ResultSetExtractor<List<User>> RESULT_SET_EXTRACTOR = new ResultSetExtractor<>() {
         @Override
         public List<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            LinkedHashMap<Integer, User> users = new LinkedHashMap<>();
+            Map<Integer, User> users = new LinkedHashMap<>();
             while (rs.next()) {
                 User parsedUser = ROW_MAPPER.mapRow(rs, rs.getRow());
                 int id = parsedUser.getId();
                 String roleAsString = rs.getString("role");
-                EnumSet<Role> parsedRoles = roleAsString != null ?
-                        EnumSet.of(Role.valueOf(roleAsString)) : EnumSet.noneOf(Role.class);
-                parsedUser.setRoles(parsedRoles);
-                if (!users.containsKey(id)) {
-                    users.put(id, parsedUser);
-                } else {
-                    User storedUser = users.get(id);
-                    EnumSet<Role> storedRoles = EnumSet.copyOf(storedUser.getRoles());
-                    storedRoles.addAll(parsedRoles);
-                    storedUser.setRoles(storedRoles);
-                    users.replace(id, storedUser);
-                }
+                Role parsedRole = roleAsString == null ? null : Role.valueOf(roleAsString);
+
+                users.computeIfAbsent(id, uId -> {
+                    parsedUser.setRoles(parsedRole != null ? Collections.singleton(parsedRole) : Collections.emptySet());
+                    return parsedUser;
+                });
+
+                users.computeIfPresent(id, (uId, u) -> {
+                    if (parsedRole != null) {
+                        u.getRoles().add(parsedRole);
+                    }
+                    return u;
+                });
+
             }
-            return users.sequencedValues().stream().toList();
+            return new ArrayList<>(users.values());
         }
     };
 
@@ -84,20 +84,20 @@ public class JdbcUserRepository implements UserRepository {
             return null;
         } else {
             deleteRolesByUserId(user.getId());
-            batchRoleInsert(EnumSet.copyOf(user.getRoles()), user.getId());
+            batchRoleInsert(user.getRoles(), user.getId());
         }
         return user;
     }
 
-    private void batchRoleInsert(EnumSet<Role> roles, int user_id) {
+    private void batchRoleInsert(Set<Role> roles, int user_id) {
         if (!roles.isEmpty()) {
                 this.jdbcTemplate.batchUpdate(
                         "INSERT INTO user_role (role, user_id) VALUES(?,?)",
                 new BatchPreparedStatementSetter() {
-                    final List<Role> copy =  List.copyOf(roles);
+                    final List<Role> roleList =  List.copyOf(roles);
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setString(1, copy.get(i).name());
+                        ps.setString(1, roleList.get(i).name());
                         ps.setInt(2, user_id);
                     }
 
@@ -109,7 +109,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     private void deleteRolesByUserId(int user_id) {
-        jdbcTemplate.update("delete from user_role where user_id = ?", user_id);
+        jdbcTemplate.update("DELETE FROM user_role WHERE user_id = ?", user_id);
     }
 
     @Override
