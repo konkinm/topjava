@@ -15,17 +15,15 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
-import javax.validation.*;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+import static ru.javawebinar.topjava.util.ValidationUtil.validateObject;
+
 @Repository
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
-
-    private static final ValidatorFactory VALIDATOR_FACTORY = Validation.buildDefaultValidatorFactory();
-    private static final Validator VALIDATOR = VALIDATOR_FACTORY.getValidator();
 
     private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class);
 
@@ -65,10 +63,7 @@ public class JdbcUserRepository implements UserRepository {
     @Transactional
     public User save(User user) {
 
-        Set<ConstraintViolation<User>> violations = VALIDATOR.validate(user);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
-        }
+        validateObject(user);
 
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
