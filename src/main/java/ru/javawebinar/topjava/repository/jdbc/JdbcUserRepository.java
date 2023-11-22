@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -16,8 +15,8 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import javax.validation.*;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -25,33 +24,27 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
 
+    private static final ValidatorFactory VALIDATOR_FACTORY = Validation.buildDefaultValidatorFactory();
+    private static final Validator VALIDATOR = VALIDATOR_FACTORY.getValidator();
+
     private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class);
 
-    private static final ResultSetExtractor<List<User>> RESULT_SET_EXTRACTOR = new ResultSetExtractor<>() {
-        @Override
-        public List<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            Map<Integer, User> users = new LinkedHashMap<>();
-            while (rs.next()) {
-                User parsedUser = ROW_MAPPER.mapRow(rs, rs.getRow());
-                int id = parsedUser.getId();
-                String roleAsString = rs.getString("role");
-                Role parsedRole = roleAsString == null ? null : Role.valueOf(roleAsString);
-
-                users.computeIfAbsent(id, uId -> {
-                    parsedUser.setRoles(parsedRole != null ? Collections.singleton(parsedRole) : Collections.emptySet());
-                    return parsedUser;
-                });
-
-                users.computeIfPresent(id, (uId, u) -> {
-                    if (parsedRole != null) {
-                        u.getRoles().add(parsedRole);
-                    }
-                    return u;
-                });
-
+    private static final ResultSetExtractor<List<User>> RESULT_SET_EXTRACTOR = rs -> {
+        Map<Integer, User> users = new LinkedHashMap<>();
+        while (rs.next()) {
+            int id = rs.getInt("id");
+            User user = users.get(id);
+            if (user == null) {
+                user = ROW_MAPPER.mapRow(rs, rs.getRow());
+                user.setRoles(EnumSet.noneOf(Role.class));
+                users.put(id, user);
             }
-            return new ArrayList<>(users.values());
+            String roleAsString = rs.getString("role");
+            if (roleAsString != null) {
+                user.getRoles().add(Role.valueOf(roleAsString));
+            }
         }
+        return new ArrayList<>(users.values());
     };
 
     private final JdbcTemplate jdbcTemplate;
@@ -71,6 +64,12 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
+
+        Set<ConstraintViolation<User>> violations = VALIDATOR.validate(user);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
         if (user.isNew()) {
