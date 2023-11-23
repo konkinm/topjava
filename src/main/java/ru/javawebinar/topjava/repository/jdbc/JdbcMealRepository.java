@@ -41,7 +41,6 @@ public class JdbcMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
-
         validateObject(meal);
 
         MapSqlParameterSource map = new MapSqlParameterSource()
