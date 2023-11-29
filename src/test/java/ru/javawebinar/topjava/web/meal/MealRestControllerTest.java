@@ -84,8 +84,10 @@ public class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void getBetween() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get(REST_URL + "between");
-        requestBuilder.param("startDateTime", "2020-01-30T20:00:00");
-        requestBuilder.param("endDateTime", "2020-01-31T23:00:00");
+        requestBuilder.param("startDate", "2020-01-30");
+        requestBuilder.param("startTime", "20:00:00");
+        requestBuilder.param("endDate", "2020-01-31");
+        requestBuilder.param("endTime", "23:00:00");
         perform(requestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
