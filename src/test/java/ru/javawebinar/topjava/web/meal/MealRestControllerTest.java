@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
@@ -13,15 +14,14 @@ import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.SecurityUtil;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Month;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.MealTestData.*;
+import static ru.javawebinar.topjava.util.MealsUtil.createTo;
 
 public class MealRestControllerTest extends AbstractControllerTest {
 
@@ -83,19 +83,13 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetween() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL +
-                "between?startDateTime=" + LocalDate.of(2020, Month.JANUARY, 30) +
-                "T" + LocalTime.of(0, 0, 0) +
-                "&endDateTime=" + LocalDate.of(2020, Month.JANUARY, 30) +
-                "T" + LocalTime.of(23, 59, 59)))
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get(REST_URL + "between");
+        requestBuilder.param("startDateTime", "2020-01-30T20:00:00");
+        requestBuilder.param("endDateTime", "2020-01-31T23:00:00");
+        perform(requestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getFilteredTos(service.getBetweenInclusive(
-                                LocalDate.of(2020, Month.JANUARY, 30),
-                                LocalDate.of(2020, Month.JANUARY, 30),
-                                SecurityUtil.authUserId()),
-                        SecurityUtil.authUserCaloriesPerDay(),
-                        LocalTime.of(0, 0, 0),
-                        LocalTime.of(23, 59, 59))));
+                .andExpect(MEAL_TO_MATCHER.contentJson(List.of(createTo(meal7, true),
+                        createTo(meal3, false))));
     }
 }
