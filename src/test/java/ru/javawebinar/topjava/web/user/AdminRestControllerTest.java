@@ -5,16 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.javawebinar.topjava.UserTestData;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 class AdminRestControllerTest extends AbstractControllerTest {
@@ -35,6 +40,20 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void getWithMeals() throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID + "/with-meals"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(USER_MATCHER.contentJson(admin))
+                .andExpect(result -> {
+                    User parsedUser = JsonUtil.readValue(result.getResponse().getContentAsString(), User.class);
+                    List<Meal> meals = parsedUser.getMeals();
+                    MEAL_MATCHER.assertMatch(meals, adminMeal2, adminMeal1);
+                });
+    }
+
+    @Test
     void getByEmail() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + "by-email?email=" + user.getEmail()))
                 .andExpect(status().isOk())
@@ -52,7 +71,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void update() throws Exception {
-        User updated = getUpdated();
+        User updated = UserTestData.getUpdated();
         perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(updated)))
@@ -63,7 +82,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void createWithLocation() throws Exception {
-        User newUser = getNew();
+        User newUser = UserTestData.getNew();
         ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(newUser)))
