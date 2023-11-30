@@ -1,14 +1,11 @@
 package ru.javawebinar.topjava.to;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class MealTo {
     private Integer id;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime dateTime;
 
     private String description;
@@ -53,7 +50,8 @@ public class MealTo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MealTo mealTo = (MealTo) o;
-        return calories == mealTo.calories && excess == mealTo.excess && Objects.equals(id, mealTo.id) && Objects.equals(dateTime, mealTo.dateTime) && Objects.equals(description, mealTo.description);
+        return calories == mealTo.calories && excess == mealTo.excess && Objects.equals(id, mealTo.id) &&
+                Objects.equals(dateTime, mealTo.dateTime) && Objects.equals(description, mealTo.description);
     }
 
     @Override
