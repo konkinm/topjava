@@ -23,12 +23,20 @@ tr[data-meal-excess="true"] {
     color: red;
 }
 
+tr[data-user-enabled="false"] {
+    opacity: 0.3;
+}
+
 .fa {
     cursor: pointer;
 }
 
 .fa-pencil {
     color: black;
+}
+
+td .fa-remove {
+    color: red;
 }
 
 /*https://getbootstrap.com/docs/4.0/examples/sticky-footer/sticky-footer.css*/

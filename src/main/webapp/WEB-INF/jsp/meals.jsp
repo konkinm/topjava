@@ -12,26 +12,41 @@
 <div class="jumbotron pt-4">
     <div class="container">
     <h3 class="text-center"><spring:message code="meal.title"/></h3>
-    <form>
-        <dl>
-            <dt><spring:message code="meal.startDate"/>:</dt>
-            <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
-        </dl>
-        <dl>
-            <dt><spring:message code="meal.endDate"/>:</dt>
-            <dd><input type="date" name="endDate" value="${param.endDate}"></dd>
-        </dl>
-        <dl>
-            <dt><spring:message code="meal.startTime"/>:</dt>
-            <dd><input type="time" name="startTime" value="${param.startTime}"></dd>
-        </dl>
-        <dl>
-            <dt><spring:message code="meal.endTime"/>:</dt>
-            <dd><input type="time" name="endTime" value="${param.endTime}"></dd>
-        </dl>
-        <button type="submit"><spring:message code="meal.filter"/></button>
-    </form>
-
+    <div class="card border-dark">
+        <div class="card-body pb-0">
+            <form id="filter">
+                       <div class="row">
+                           <div class="col-2">
+                               <label for="startDate"><spring:message code="meal.startDate"/></label>
+                               <input class="form-control" name="startDate" id="startDate" autocomplete="off">
+                           </div>
+                           <div class="col-2">
+                               <label for="endDate"><spring:message code="meal.endDate"/></label>
+                               <input class="form-control" name="endDate" id="endDate" autocomplete="off">
+                           </div>
+                           <div class="offset-2 col-3">
+                               <label for="startTime"><spring:message code="meal.startTime"/></label>
+                               <input class="form-control" name="startTime" id="startTime" autocomplete="off">
+                           </div>
+                           <div class="col-3">
+                               <label for="endTime"><spring:message code="meal.endTime"/></label>
+                               <input class="form-control" name="endTime" id="endTime" autocomplete="off">
+                           </div>
+                       </div>
+                   </form>
+               </div>
+               <div class="card-footer text-right">
+                   <button class="btn btn-danger" onclick="clearFilter()">
+                       <span class="fa fa-remove"></span>
+                       <spring:message code="common.cancel"/>
+                   </button>
+                   <button class="btn btn-primary" onclick="ctx.updateTable()">
+                       <span class="fa fa-filter"></span>
+                       <spring:message code="meal.filter"/>
+                   </button>
+        </div>
+    </div>
+    <br/>
     <button class="btn btn-primary" onclick="add()">
                 <span class="fa fa-plus"></span>
                 <spring:message code="common.add"/>
@@ -58,8 +73,8 @@
                 </td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
-                <td><a><span class="fa fa-pencil"></span></a></td>
-                <td><a class="delete"><span class="fa fa-remove"></span></a></td>
+                <td><a><span class="fa fa-pencil" title="<spring:message code="meal.edit"/>"></span></a></td>
+                <td><a class="delete"><span class="fa fa-remove" title="<spring:message code="common.delete"/>"></span></a></td>
             </tr>
         </c:forEach>
     </table>
@@ -109,4 +124,5 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
+<jsp:include page="fragments/i18n.jsp"/>
 </html>

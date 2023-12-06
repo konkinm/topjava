@@ -33,6 +33,7 @@ public class UserTestData {
     static {
         user.setMeals(meals);
         admin.setMeals(List.of(adminMeal2, adminMeal1));
+        guest.setEnabled(false);
     }
 
     public static User getNew() {

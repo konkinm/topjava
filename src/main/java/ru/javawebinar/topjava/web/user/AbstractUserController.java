@@ -33,6 +33,11 @@ public abstract class AbstractUserController {
         return service.create(user);
     }
 
+    public void enable(int id, boolean enabled) {
+        log.info("enable {} {}", id, enabled);
+        service.enable(id, enabled);
+    }
+
     public void delete(int id) {
         log.info("delete {}", id);
         service.delete(id);
