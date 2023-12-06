@@ -19,6 +19,7 @@ function makeEditable(datatableApi) {
 
 function add() {
     form.find(":input").val("");
+    $('input[type=datetime-local]').val(new Date().toJSON().slice(0,19));
     $("#editRow").modal();
 }
 
