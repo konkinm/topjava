@@ -97,7 +97,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void disable() throws Exception {
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put(REST_URL + USER_ID);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.patch(REST_URL + USER_ID);
         perform(requestBuilder
                 .param("enabled", "false"))
                 .andExpect(status().isNoContent());
@@ -106,7 +106,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void enable() throws Exception {
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put(REST_URL + GUEST_ID);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.patch(REST_URL + GUEST_ID);
         perform(requestBuilder
                 .param("enabled", "true"))
                 .andExpect(status().isNoContent());

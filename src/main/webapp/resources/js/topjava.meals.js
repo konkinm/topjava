@@ -15,7 +15,7 @@ const ctx = {
 
 function clearFilter() {
     $("#filter")[0].reset();
-    $.get(mealAjaxUrl, updateTableByData);
+    $.get(mealsAjaxUrl, updateTableByData);
 }
 
 $.ajaxSetup({
