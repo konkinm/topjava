@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <script type="text/javascript">
+    var localeCode = "<spring:message code="app.locale"/>";
+
     const i18n = {}; // https://learn.javascript.ru/object
 
     i18n["addTitle"] = '<spring:message code="${param.entity}.add"/>';
