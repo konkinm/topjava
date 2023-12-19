@@ -19,6 +19,7 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -26,6 +27,13 @@ import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 @Order(Ordered.HIGHEST_PRECEDENCE + 5)
 public class ExceptionInfoHandler {
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
+
+    public static final String DUPLICATE_EMAIL_MSG = "User with this email already exists";
+    public static final String DUPLICATE_DATETIME_MSG = "You already have the meal with same date/time";
+
+    private static final Map<String, String> MSG_MAP = Map.of(
+            "users_unique_email_idx", DUPLICATE_EMAIL_MSG,
+            "meal_unique_user_datetime_idx", DUPLICATE_DATETIME_MSG);
 
     //  http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -37,6 +45,15 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
+        String rootMsg = ValidationUtil.getRootCause(e).getMessage();
+        if (rootMsg != null) {
+            String lowerCaseMsg = rootMsg.toLowerCase();
+            for (Map.Entry<String, String> entry : MSG_MAP.entrySet()) {
+                if (lowerCaseMsg.contains(entry.getKey())) {
+                    return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, entry.getValue());
+                }
+            }
+        }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
@@ -53,13 +70,14 @@ public class ExceptionInfoHandler {
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
+    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, String... details) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
+        return new ErrorInfo(req.getRequestURL(), errorType,
+                details.length != 0 ? details : new String[]{rootCause.getMessage()});
     }
 }
